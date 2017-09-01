@@ -1,0 +1,10 @@
+- transaction_url = person_transaction_url(@recipient, @url_params.merge({:id => @transaction.id.to_s}))
+
+%tr
+  %td{:align => "left"}
+    %font{body_font}
+      = t("emails.payment_reminder.upcoming_booking_starts_owner_reminder.the_rental_is_only_5_days_away", :listing_title => @transaction.listing.title, :payer_full_name => @payer.name(@transaction.community), :start_date => @booking.start_on, :end_date => @booking.end_on).html_safe
+
+%tr
+  %td{:align => "left", :style => "padding-top: 25px; padding-bottom: 25px;"}
+    = render :partial => "green_action_button", :locals => { :text => t("emails.payment_reminder.upcoming_booking_starts_owner_reminder.view_rental"), :url => transaction_url }

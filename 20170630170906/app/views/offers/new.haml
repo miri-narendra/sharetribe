@@ -1,0 +1,43 @@
+- payment_gateway = Maybe(@current_community).payment_gateway
+- content_for :javascript do
+  initialize_new_offer_form('#{invoice_person_offers_url(person_id: @current_user)}', #{@listing_conversation.seller.commission_percent_for(@current_community) || "null"});
+
+- content_for :title_header do
+  %h1= t("layouts.no_tribe.new_offer")
+
+.conversation-status-form{:class => (@current_community.vat ? "centered-section-wide" : "centered-section")}
+  %h2= t(".header")
+  = form_for @listing_conversation, :url => person_offers_path(person_id: @current_user), :html => { :method => "post" } do |form|
+
+    .input-group
+      = label_tag t('.for_renter')
+      = link_to renter.name(@current_community), person_path(renter)
+      = hidden_field_tag(:renter_id, renter.id)
+
+    .input-group
+      = label_tag t('.listing')
+      = select_tag :listing_id, options_from_collection_for_select(open_listings, :id, :title, selected_listing.id)
+
+    .input-group
+      .row
+        .col-12
+          = render partial: "listings/listing_actions_booking_form", locals: {delivery_opts: delivery_opts, listing_unit_type: listing_unit_type, is_author: is_author}
+
+    = form.fields_for :cart do |cart_form|
+      .input-group
+        .row
+          .col-12
+          = label_tag t('.security_deposit')
+          = cart_form.text_field :security_deposit
+
+      .input-group
+        = render 'transactions/cart_form_fields_for_owner', form: cart_form, show_pickup_dropoff_fee: true
+
+    #offer-invoice{style: "background-color: #e8e8e8; padding-left: 10px; padding-top: 1px"}
+      = render partial: @current_community.payment_gateway.form_template_dir + "/form"
+
+    = fields_for :message, message_form do |message_form|
+      = message_form.label :content, t("conversations.new.message"), :class => "input"
+      = message_form.text_area :content, :class => "text_area", :placeholder => t("conversations.accept.optional_message")
+
+    = form.button t("conversations.new.submit"), :class => "send_button", :id => "send_button"

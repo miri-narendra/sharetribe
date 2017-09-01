@@ -1,0 +1,15 @@
+- if transaction_model.current_state == 'pending' && transaction_model.seller.id == @current_user.id
+  .centered-section.payment-form
+    %p
+      = t('transactions.pickup_dropoff_fee_form.title')
+
+    = form_for cart,
+      url: person_cart_path(person_id: @current_user.id, id: cart.id),
+      html: {style: 'padding-bottom: 0px'} do |form|
+
+      = render 'transactions/cart_form_fields_for_owner', form: form, show_pickup_dropoff_fee: cart.allow_pickup_dropoff_fee?
+
+      .row
+        .col-12
+          = form.button t('transactions.pickup_dropoff_fee_form.submit'), class: 'send_button', style: 'float: right'
+

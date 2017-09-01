@@ -1,0 +1,56 @@
+%p{style: "text-align:left;"}
+  There is a 5-day arrears on the following transactions:
+
+- @stuck_scheduled_payments.each do |payment|
+  - transaction = payment.tx
+  - owner = transaction.listing.author
+  - owner_email = owner.emails.last.address
+  - listing = transaction.listing
+  - renter = transaction.starter
+  - renter_email = renter.emails.last.address
+  - booking = transaction.booking
+  - cart = transaction.cart
+  %div{:style => "margin: 15px 0; padding: 10px; background-color: #d1c9b4; text-align:left;"}
+    %b Owner Name:
+    = owner.name(@community)
+    %br/
+    %b Owner Email:
+    = owner_email
+    %br/
+    %b Owner Phone:
+    = owner.phone_number
+    %br/
+    %b Vehicle requested:
+    = listing.title
+    %br/
+    %b Renter Name:
+    = renter.name(@community)
+    %br/
+    %b Renter Email:
+    = renter_email
+    %br/
+    %b Renter Phone:
+    = renter.phone_number
+    %br/
+    %b Date From:
+    = l(booking.start_on, format: :default)
+    %br/
+    %b Date To:
+    = l(booking.end_on, format: :default)
+    %br/
+    %b Pickup location:
+    = cart.pickup_location
+    %br/
+    %b Drop off location:
+    = cart.dropoff_location
+    %br/
+    %b Renter message:
+    - last_message = transaction.conversation.last_message_by(renter)
+    = last_message.content if last_message
+    %br/
+    = link_to "View transaction", person_transaction_url(@url_params.merge({person_id: owner.id, id: transaction.id}))
+    %br/
+%br/
+
+%p{style: "text-align:left;"}
+  This is an automatic message sent to administrators of #{@community.full_name(I18n.default_locale)}.

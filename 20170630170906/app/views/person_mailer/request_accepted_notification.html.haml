@@ -1,0 +1,30 @@
+= @transaction.seller.name(@community)
+has accepted the following request from
+= @transaction.buyer.name(@community)
+
+%div{:style => "margin: 15px 0; padding: 10px; background-color: #d1c9b4;"}
+  %b Adjusted Price
+  = @transaction.payment.adjusted_sum.to_s
+  %br/
+  %b Vehicle Requested
+  = @transaction.listing.title
+  %br/
+  %b date from:
+  = l(@transaction.booking.start_on, format: :default)
+  %br/
+  %b date to:
+  = l(@transaction.booking.end_on, format: :default)
+  %br/
+  %b Pickup Location
+  = @transaction.cart.pickup_location
+  %br/
+  %b Drop Off Location
+  = @transaction.cart.dropoff_location
+  %br/
+  %b Owner Message
+  - message = @transaction.conversation.last_message_by(@transaction.seller)
+  = message.content unless message.nil?
+  %br/
+
+
+This is an automatic message sent to administrators of #{@community.full_name(@transaction.seller.locale)}.

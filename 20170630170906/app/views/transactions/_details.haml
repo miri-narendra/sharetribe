@@ -1,0 +1,35 @@
+.message-avatar-padding
+  .row
+    .col-12
+
+      %h2
+        = link_to_unless listing[:deleted], listing[:title], listing_path(id: listing[:id])
+
+      - if price_break_down_locals.present?
+        = render partial: "transactions/price_break_down", locals: price_break_down_locals
+
+      - if @current_community.vat.present?
+        .message-price-vat
+          = t("conversations.show.price_excludes_vat")
+
+      = render partial: "transactions/shipping_address", locals: { shipping_address: tx[:shipping_address] }
+      = render partial: "transactions/cart_form_for_owner", locals: {cart: transaction_model.cart, transaction_model: transaction_model}
+
+      - payment_schedule = TransactionService::PaymentSchedule.get(community_id: transaction_model.community_id, transaction_id: transaction_model.id)
+      - if transaction_model.payment_gateway == "none"
+
+      - elsif transaction_model.payment && !payment_schedule.all_payments_paid? && is_author
+        .conversation-status
+          .inbox-horizontally-aligned-status
+            = t(".waiting_for_payment")
+      - else
+        %div{:id => "transaction_status"}
+          = render :partial => "transactions/status/status", :locals => { :__transaction_model => transaction_model, role: role, is_author: is_author, payment_schedule: payment_schedule}
+
+      - if @current_user.is_owner? && transaction_model.listing.author == @current_user
+        = link_to t("conversations.show.new_offer"), new_person_offer_path(person_id: @current_user, transaction_id: transaction_model.id), class: 'button'
+
+      - if @current_user.is_owner? && transaction_model.listing.author == @current_user && ["accepted", "paid"].include?(transaction_model.current_state)
+        - cancel = { link_href: refund_and_cancel_person_message_path(@current_user, :id => transaction_model.id), link_classes: 'cancel', link_icon_with_text_classes: icon_for("canceled"), link_text_with_icon: t("common.cancel") }
+        %div{:class => "conversation-status"}
+          = render :partial => "transactions/status/status_link", :locals => { :conversation => transaction_model, :status_link => cancel }

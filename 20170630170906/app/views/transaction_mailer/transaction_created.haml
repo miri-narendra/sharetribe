@@ -1,0 +1,7 @@
+%tr
+  %td{:align => "left"}
+    %font{body_font}
+
+      = t("emails.new_transaction.rental_request_message", :sender => sender_name)
+
+= render :partial => "person_mailer/action_button", :locals => { :text => t("emails.new_transaction.view_message"), :url => reply_url}

@@ -1,0 +1,23 @@
+- content_for :javascript do
+  initialize_stripe_account_form("#{I18n.locale}");
+
+= render partial: "layouts/left_hand_navigation", locals: { links: settings_links_for(@current_user, @current_community) }
+
+.left-navi-section.settings-section
+
+  %h2= t(".add_payout_details")
+
+  = link_to stripe_connect_url, class: 'stripe-connect' do
+    %span
+      = t(".connect_to_stripe")
+
+  %br/
+  %br/
+
+  %p
+    = link_to "https://stripe.com/" do
+      = image_tag("payments/stripe-logo.png", height: '32')
+
+    %br/
+
+    = t("stripe_accounts.our_secure_payment_provider")

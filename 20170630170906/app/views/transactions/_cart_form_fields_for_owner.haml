@@ -1,0 +1,49 @@
+- if show_pickup_dropoff_fee
+  .row
+    .col-4
+      = form.label :pickup_dropoff_fee
+    .col-7
+      = form.text_field :pickup_dropoff_fee, class: :text_field, placeholder: t('transactions.pickup_dropoff_fee_form.pickup_dropoff_fee_placeholder')
+    .col-1
+.row
+  .col-4
+    = form.label :discount
+  .col-7
+    = form.text_field :discount, class: :text_field, placeholder: t('transactions.pickup_dropoff_fee_form.discount_placeholder')
+  .col-1
+.input-group.cart_other_fees_wrapper
+  = form.fields_for :other_fees do |other_fee_form|
+    = render 'transactions/cart_other_fee_form_fields', other_fee_form: other_fee_form
+  %script{:type => 'html/template', :id => 'other_fee_form_template'}
+    = form.fields_for :other_fees, OtherFee.new, :hidden_field_id => true do |other_fee_form|
+      = render 'transactions/cart_other_fee_form_fields', other_fee_form: other_fee_form
+  .row.other_fee_add_new_placeholder.without-margin
+    .col-12
+      = button_tag t('transactions.pickup_dropoff_fee_form.add_other_fee'), class: 'add_other_fee_btn send_button small-button', type: 'button', style: 'float: right'
+
+- content_for :javascript do
+  :plain
+  $(document).ready(function() {
+    function add_other_fee(){
+      template = $('#other_fee_form_template').text();
+      old_idx = template.match(/other_fees_attributes_(\d+)_name/g)[0].match(/\d+/g)[0];
+      new_idx = new Date().getTime();
+      template = template.replace(new RegExp("\\["+old_idx+"\\]","g"), "["+new_idx+"]");
+      template = template.replace(new RegExp("_"+old_idx+"_","g"), "_"+new_idx+"_");
+      $('.other_fee_add_new_placeholder').before(template);
+    }
+
+    function remove_other_fee(event){
+      if(event.target.checked){
+        fee_wrapper = $(event.target).parent().parent();
+        fee_wrapper.hide();
+        fee_wrapper.find('input:text').val("")
+      }else{
+        $(event.traget).parent().parent().show();
+      }
+    }
+
+    $('.cart_other_fees_wrapper').on('change', '.destroy_other_fee_btn', remove_other_fee);
+    $('.add_other_fee_btn').click(add_other_fee);
+  });
+

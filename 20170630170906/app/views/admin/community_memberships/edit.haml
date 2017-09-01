@@ -1,0 +1,17 @@
+- content_for :title_header do
+  %h1
+    = t("layouts.admin.admin")
+    = "-"
+    = t("admin.communities.manage_members.manage_members")
+= render :partial => "admin/left_hand_navigation", :locals => { :links => admin_links_for(@current_community) }
+
+.left-navi-section
+  %h2= t("admin.communities.manage_members.edit_member", member_name: @membership.person.full_name)
+
+  = form_for @membership, url: admin_community_community_membership_path(@community.id, @membership.id), method: :put do |f|
+    = f.fields_for :person do |p|
+      = p.label :phone_number
+      = p.text_field :phone_number, value: @membership.person.phone_number
+      = p.label :email
+      = p.text_field :email, value: @membership.person.emails.last.address
+    = f.button "Save", type: "submit"

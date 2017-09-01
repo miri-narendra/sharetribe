@@ -1,0 +1,31 @@
+@import "mixins/all";
+
+/*
+  -----------------
+  Dashboard styling
+  -----------------
+*/
+
+.dashbox{
+  border-right: 1px solid #c3c3c3;
+  &:first-child {
+    border-left: 1px solid #c3c3c3;
+  }
+}
+
+.dashbox-icon{
+  text-align: right;
+  padding-top: 8px;
+  i {
+    font-size: 150%;
+  }
+}
+
+.dashbox-value{
+  text-align: center;
+}
+
+.dashbox-header{
+  color: #c3c3c3;
+  text-transform: uppercase;
+}

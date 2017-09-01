@@ -1,0 +1,131 @@
+<!doctype html>
+
+<%
+  # We need to render and capture the sections already here, before the <head> element
+  # because we want to add the section specific styles to the <head> element.
+  # If we'd render the sections after the <head> elements, the section specific
+  # styles would be empty
+%>
+<% content_for :sections do %>
+  <% sections.each do |section| %>
+
+    <% s = section["section"] %>
+    <% section_id = "#{s['kind']}__#{s['id']}" %>
+
+    <% case s["kind"] %>
+    <% when "hero" %>
+      <%= render partial: "hero", locals: {section_id: section_id, s: s} %>
+    <% when "footer" %>
+      <%= render partial: "footer", locals: {section_id: section_id, s: s} %>
+    <% when "info" %>
+      <%= render partial: "info", locals: {section_id: section_id, s: s} %>
+    <% when "categories" %>
+      <%= render partial: "categories", locals: {section_id: section_id, s: s} %>
+    <% end %>
+
+  <% end # sections#each %>
+<% end # capture %>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title><%= page["title"]["value"] %></title>
+
+  <!-- SEO Meta -->
+  <!--
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+  -->
+
+  <style type="text/css">
+   /**
+    * The fonts included are copyrighted by the vendor listed below.
+    *
+    * Vendor:      Mark Simonson Studio
+    * License URL: https://www.fontspring.com/licenses/mark-simonson-studio/webfont
+    *
+    *
+    */
+
+   @font-face {
+     font-family: 'ProximaNovaSoft-Bold';
+     src: url('<%= font_path %>/proximanovasoft-bold-webfont.eot');
+     src: url('<%= font_path %>/proximanovasoft-bold-webfont.eot?#iefix') format('embedded-opentype'),
+     url('<%= font_path %>/proximanovasoft-bold-webfont.woff2') format('woff2'),
+     url('<%= font_path %>/proximanovasoft-bold-webfont.woff') format('woff'),
+     url('<%= font_path %>/proximanovasoft-bold-webfont.ttf') format('truetype'),
+     url('<%= font_path %>/proximanovasoft-bold-webfont.svg#proxima_nova_softbold') format('svg');
+     font-weight: normal;
+     font-style: normal;
+   }
+
+   @font-face {
+     font-family: 'ProximaNovaSoft-Medium';
+     src: url('<%= font_path %>/proximanovasoft-medium-webfont.eot');
+     src: url('<%= font_path %>/proximanovasoft-medium-webfont.eot?#iefix') format('embedded-opentype'),
+     url('<%= font_path %>/proximanovasoft-medium-webfont.woff2') format('woff2'),
+     url('<%= font_path %>/proximanovasoft-medium-webfont.woff') format('woff'),
+     url('<%= font_path %>/proximanovasoft-medium-webfont.ttf') format('truetype'),
+     url('<%= font_path %>/proximanovasoft-medium-webfont.svg#proxima_nova_softmedium') format('svg');
+     font-weight: normal;
+     font-style: normal;
+   }
+
+   @font-face {
+     font-family: 'ProximaNovaSoft-Regular';
+     src: url('<%= font_path %>/proximanovasoft-regular-webfont.eot');
+     src: url('<%= font_path %>/proximanovasoft-regular-webfont.eot?#iefix') format('embedded-opentype'),
+     url('<%= font_path %>/proximanovasoft-regular-webfont.woff2') format('woff2'),
+     url('<%= font_path %>/proximanovasoft-regular-webfont.woff') format('woff'),
+     url('<%= font_path %>/proximanovasoft-regular-webfont.ttf') format('truetype'),
+     url('<%= font_path %>/proximanovasoft-regular-webfont.svg#proxima_nova_softregular') format('svg');
+     font-weight: normal;
+     font-style: normal;
+   }
+
+   @font-face {
+     font-family: 'ProximaNovaSoft-Semibold';
+     src: url('<%= font_path %>/proximanovasoft-semibold-webfont.eot');
+     src: url('<%= font_path %>/proximanovasoft-semibold-webfont.eot?#iefix') format('embedded-opentype'),
+     url('<%= font_path %>/proximanovasoft-semibold-webfont.woff2') format('woff2'),
+     url('<%= font_path %>/proximanovasoft-semibold-webfont.woff') format('woff'),
+     url('<%= font_path %>/proximanovasoft-semibold-webfont.ttf') format('truetype'),
+     url('<%= font_path %>/proximanovasoft-semibold-webfont.svg#proxima_nova_softsemibold') format('svg');
+     font-weight: normal;
+     font-style: normal;
+   }
+  </style>
+
+  <style type="text/css">
+    <% # Basic styling %>
+    <%= styles %>
+
+    <% # Styles from section partials. E.g. styles that need marketplace color %>
+    <%= yield :hero_css %>
+    <%= yield :footer_css %>
+    <%= yield :info_css %>
+    <%= yield :categories_css %>
+  </style>
+
+</head>
+<body>
+
+<%= yield :sections %>
+
+<% # Add javascript libraries %>
+
+<% if sections.any? { |s| s["section"]["kind"] == "hero" && s["section"]["variation"]["value"] == "location_search" } %>
+  <script src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
+  <script>
+    <%= javascripts[:location_search] %>
+  </script>
+<% end %>
+
+<% # Add javascript from sections %>
+
+<%= yield :javascript %>
+
+</body>
+</html>

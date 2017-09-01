@@ -1,0 +1,45 @@
+.row
+  .col-3.dashbox
+    .row.without-margin
+      .col-3.dashbox-icon
+        = icon_tag('road', ['icon-fix-rel'])
+      .col-9.dashbox-value
+        .row.without-margin
+          .col-12
+            = dashboard[:booked_trips]
+        .row.without-margin
+          .col-12.dashbox-header
+            = t('conversations.dashboard.owner.booked_trips')
+  .col-3.dashbox
+    .row.without-margin
+      .col-3.dashbox-icon
+        = icon_tag('calendar', ['icon-fix-rel'])
+      .col-9.dashbox-value
+        .row.without-margin
+          .col-12
+            = dashboard[:days_till_next_trip]
+        .row.without-margin
+          .col-12.dashbox-header
+            = t('conversations.dashboard.owner.days_till_next_trip')
+  .col-3.dashbox
+    .row.without-margin
+      .col-3.dashbox-icon
+        = icon_tag('ok', ['icon-fix-rel'])
+      .col-9.dashbox-value
+        .row.without-margin
+          .col-12
+            = humanized_money_with_symbol(dashboard[:payments_received])
+        .row.without-margin
+          .col-12.dashbox-header
+            = t('conversations.dashboard.owner.payments_received')
+  .col-3.dashbox
+    .row.without-margin
+      .col-3.dashbox-icon
+        = icon_tag('money', ['icon-fix-rel'])
+      .col-9.dashbox-value
+        .row.without-margin
+          .col-12
+            = humanized_money_with_symbol(dashboard[:next_payment_due])
+        .row.without-margin
+          .col-12.dashbox-header
+            = t('conversations.dashboard.owner.next_payment_due')

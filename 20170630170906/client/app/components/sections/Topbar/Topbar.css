@@ -1,0 +1,129 @@
+@custom-media --Topbar_small (min-width: 30rem);
+@custom-media --Topbar_medium (min-width: 50rem);
+
+.topbar {
+  display: flex;
+  flex-direction: row;
+  height: var(--Topbar_mobileHeight);
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--colorBackground);
+  border-bottom: 1px solid rgba(0, 0, 50, 0.1);
+
+  @media (--Topbar_medium) {
+    height: var(--Topbar_height);
+    padding: var(--Topbar_padding);
+  }
+
+  /* Base styles */
+  box-sizing: border-box;
+
+  & * {
+    box-sizing: border-box;
+  }
+
+  & input[type='search'] {
+    -webkit-appearance: none; /* stylelint-disable-line property-no-vendor-prefix */
+
+    &::-webkit-search-decoration,
+    &::-webkit-search-cancel-button,
+    &::-webkit-search-results-button,
+    &::-webkit-search-results-decoration {
+      display: none;
+    }
+  }
+
+  & form,
+  & input,
+  & button,
+  & svg {
+    font-family: var(--Topbar_fontFamily);
+  }
+  & input {
+    font-size: var(--Topbar_inputFontSizeMobile);
+
+    @media (--Topbar_medium) {
+      font-size: var(--Topbar_fontSize);
+    }
+  }
+
+  & .topbarMenu {
+    display: none;
+  }
+
+  & .topbarMobileMenu {
+    display: block;
+  }
+
+  @media (--large-viewport) {
+    & .topbarMenu {
+      display: block;
+    }
+
+    & .topbarMobileMenu {
+      display: none;
+    }
+  }
+
+  & .topbarLanguageMenuLabel {
+    font-size: var(--Menu_fontSizeSmall);
+  }
+
+  & > * {
+    margin-right: var(--Topbar_itemSpacing);
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+.topbarSpacer {
+  display: none;
+
+  @media (--Topbar_medium) {
+    flex-grow: 30;
+    display: block;
+  }
+}
+
+.topbarMobileMenu {
+  font-size: var(--Topbar_fontSizeMobile);
+}
+
+.topbarLogo {
+  height: var(--Topbar_logoHeight);
+  max-width: var(--Topbar_textLogoMaxWidth);
+}
+
+.topbarAvatarDropdown {
+  padding: var(--Topbar_avatarMobilePadding);
+  font-family: var(--Topbar_fontFamily);
+  font-size: var(--Topbar_fontSize);
+  align-self: flex-start;
+  display: none;
+
+  @media (--Topbar_small) {
+    display: block;
+  }
+
+  @media (--Topbar_medium) {
+    padding: var(--Topbar_avatarPadding);
+  }
+}
+
+.topbarAvatarDropdownPlaceholder {
+  margin: var(--Topbar_avatarMobilePadding);
+  width: var(--Topbar_avatarSize);
+  height: var(--Topbar_avatarSize);
+  display: none;
+
+  @media (--Topbar_small) {
+    display: block;
+  }
+
+  @media (--Topbar_medium) {
+    margin: var(--Topbar_avatarPadding);
+  }
+}

@@ -1,0 +1,162 @@
+.initiate-transaction-totals
+  - if booking
+    .initiate-transaction-per-unit-wrapper
+      %span.initiate-transaction-per-unit-label
+        = t("transactions.initiate.price_per_day")
+      %span.initiate-transaction-per-unit-value
+        = humanized_money_with_symbol(listing_price)
+
+    .initiate-transaction-booking-wrapper
+      %span.initiate-transaction-booking-label
+        = t("transactions.initiate.booked_days")
+      %span.initiate-transaction-booking-value
+        = l start_on, format: :long_with_abbr_day_name
+        = "-"
+        = l end_on, format: :long_with_abbr_day_name
+        = "(#{pluralize(duration, t("listing_conversations.preauthorize.day"), t("listing_conversations.preauthorize.days"))})"
+
+  - elsif quantity.present? && localized_unit_type.present?
+    .initiate-transaction-per-unit-wrapper
+      %span.initiate-transaction-per-unit-label
+        = t("transactions.price_per_quantity", unit_type: localized_unit_type)
+      %span.initiate-transaction-per-unit-value
+        = humanized_money_with_symbol(listing_price)
+    - if quantity > 1
+      .initiate-transaction-quantity-wrapper
+        %span.initiate-transaction-quantity-label
+          = localized_selector_label || t("transactions.initiate.quantity")
+        %span.initiate-transaction-quantity-value
+          = quantity
+
+  - if subtotal.present? && subtotal != total
+    .initiate-transaction-sum-wrapper
+      %span.initiate-transaction-sum-label
+        = t("transactions.initiate.subtotal")
+      %span.initiate-transaction-sum-value
+        = humanized_money_with_symbol(subtotal)
+
+  - if cart && cart[:housekeeping_kit]
+    .initiate-transaction-sum-wrapper
+      %span.initiate-transaction-sum-label
+        = t("transactions.initiate.housekeeping_kit")
+      %span.initiate-transaction-sum-value
+        = (cart[:housekeeping_kit_price] > 0 ? humanized_money_with_symbol(cart[:housekeeping_kit_price]) : "included")
+
+  -# if cart && cart[:cleaning_fee]
+    .initiate-transaction-sum-wrapper
+      %span.initiate-transaction-sum-label
+        = t("transactions.initiate.cleaning_fee")
+      %span.initiate-transaction-sum-value
+        = (cart[:cleaning_fee] > 0 ? humanized_money_with_symbol(cart[:cleaning_fee]) : "included")
+
+  -# if cart && cart[:dump_water_fee]
+    .initiate-transaction-sum-wrapper
+      %span.initiate-transaction-sum-label
+        = t("transactions.initiate.dump_water_fee")
+      %span.initiate-transaction-sum-value
+        = (cart[:dump_water_fee] > 0 ? humanized_money_with_symbol(cart[:dump_water_fee]) : "included")
+
+  - if cart && cart[:additional_miles].present? && cart[:additional_miles] > 0
+    .initiate-transaction-sum-wrapper
+      %span.initiate-transaction-sum-label
+        = "#{t("transactions.initiate.additional_miles")} (#{cart[:additional_miles]}):"
+      %span.initiate-transaction-sum-value
+        = humanized_money_with_symbol(cart[:additional_miles]*cart[:additional_miles_price_per_mile])
+
+  - if cart && cart[:additional_generator_hours].present? && cart[:additional_generator_hours] > 0
+    .initiate-transaction-sum-wrapper
+      %span.initiate-transaction-sum-label
+        = "#{t("transactions.initiate.additional_generator_hours")} (#{cart[:additional_generator_hours]}):"
+      %span.initiate-transaction-sum-value
+        = humanized_money_with_symbol(cart[:generator_hours_price_per_hour]*cart[:additional_generator_hours])
+
+  - if cart && cart[:pickup_location].present?
+    .initiate-transaction-sum-wrapper
+      %span.initiate-transaction-sum-label
+        = t("transactions.initiate.pickup_location")
+      %span.initiate-transaction-sum-value
+        = cart[:pickup_location]
+
+  - if cart && cart[:dropoff_location].present?
+    .initiate-transaction-sum-wrapper
+      %span.initiate-transaction-sum-label
+        = t("transactions.initiate.dropoff_location")
+      %span.initiate-transaction-sum-value
+        = cart[:dropoff_location]
+
+  - if cart && ((cart[:pickup_dropoff_fee].present? && cart[:pickup_dropoff_fee] > 0) || cart[:pickup_location].present? || cart[:dropoff_location].present?)
+    .initiate-transaction-sum-wrapper
+      %span.initiate-transaction-sum-label
+        = "#{t("transactions.initiate.pickup_dropoff_fee")}"
+      %span.initiate-transaction-sum-value
+        - if transaction_status == "pending" && (cart[:pickup_dropoff_fee].nil? || cart[:pickup_dropoff_fee] == 0)
+          = "will be set by owner"
+        - else
+          = humanized_money_with_symbol(cart[:pickup_dropoff_fee])
+
+  - if cart && cart[:other_fees].present?
+    - cart[:other_fees].each_pair do |other_fee_id, other_fee|
+      .initiate-transaction-sum-wrapper
+        %span.initiate-transaction-sum-label
+          = other_fee[:name].camelcase+":"
+        %span.initiate-transaction-sum-value
+          = humanized_money_with_symbol(other_fee[:amount])
+
+  - if cart && (cart[:discount].present? && cart[:discount] != 0)
+    .initiate-transaction-sum-wrapper
+      %span.initiate-transaction-sum-label
+        = "#{t("transactions.initiate.discount")}"
+      %span.initiate-transaction-sum-value
+        = humanized_money_with_symbol(cart[:discount] * -1)
+
+  - if shipping_price.present?
+    .initiate-transaction-shipping-price-wrapper
+      %span.initiate-transaction-shipping-price-label
+        = t("transactions.initiate.shipping-price")
+      %span.initiate-transaction-shipping-price-value
+        = humanized_money_with_symbol(shipping_price)
+
+  - if total.present?
+    .initiate-transaction-total-wrapper
+      %span.initiate-transaction-total-label
+        - if total_label.present?
+          = total_label
+        - else
+          = t("transactions.total")
+      %span.initiate-transaction-total-value
+        = humanized_money_with_symbol(total)
+
+  - if(security_deposit_sum.present? && security_deposit_is_due_on.present? && security_deposit_is_due_on <= Date.current)
+    .initiate-transaction-security-deposit-sum-wrapper
+      %span.initiate-transaction-security-deposit-sum-label
+        = t("transactions.initiate.security_deposit_sum", due_on: l(security_deposit_is_due_on, format: :default))
+      %span.initiate-transaction-security-deposit-sum-value
+        = humanized_money_with_symbol(security_deposit_sum)
+
+  - if paid_sum.present? && (paid_sum != Money.new(0, 'USD'))
+    .initiate-transaction-paid-sum-wrapper
+      %span.initiate-transaction-paid-sum-label
+        = t("transactions.initiate.paid_sum")
+      %span.initiate-transaction-paid-sum-value
+        = humanized_money_with_symbol(paid_sum)
+
+  - if due_now_sum.present?
+    .initiate-transaction-due-now-sum-wrapper
+      %span.initiate-transaction-due-now-sum-label
+        = t("transactions.initiate.due_now_sum")
+      %span.initiate-transaction-due-now-sum-value
+        = humanized_money_with_symbol(due_now_sum)
+
+  - if(second_payment_sum.present? && second_payment_is_due_on.present? && second_payment_is_due_on > Date.current)
+    .initiate-transaction-second-payment-sum-wrapper
+      %span.initiate-transaction-second-payment-sum-label
+        = t("transactions.initiate.second_payment_sum", due_on: l(second_payment_is_due_on, format: :default))
+      %span.initiate-transaction-second-payment-sum-value
+        = humanized_money_with_symbol(second_payment_sum)
+
+  - if(security_deposit_sum.present? && security_deposit_is_due_on.present? && security_deposit_is_due_on > Date.current)
+    .initiate-transaction-security-deposit-sum-wrapper
+      %span.initiate-transaction-security-deposit-sum-label
+        = t("transactions.initiate.security_deposit_sum", due_on: l(security_deposit_is_due_on, format: :default))
+      %span.initiate-transaction-security-deposit-sum-value
+        = humanized_money_with_symbol(security_deposit_sum)

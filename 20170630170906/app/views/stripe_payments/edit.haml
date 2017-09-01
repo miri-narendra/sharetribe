@@ -1,0 +1,107 @@
+- transaction = @conversation
+- listing = @conversation.listing
+- booking = transaction.booking
+
+-#TODO VP how do i switch from working with StripePayment to working wiht PaymentSplit
+
+- content_for :title_header do
+  %h1= t('.new_credit_card_payment')
+
+.centered-section.payment-form
+
+  %h2
+    - if transaction.status == 'accepted'
+      - if @current_user == transaction.starter
+        = t('.payment_title')
+    - else
+      = link_to_unless listing[:deleted], listing[:title], listing_path(id: listing[:id])
+  %small(style='margin-bottom: 5px')
+    = t('.help_text').html_safe
+
+  - payment_receiver = @conversation.payment_receiver
+
+  %table
+    %tr
+      %td= t('.listing_title_label')
+      %td.right= link_to "#{@conversation.listing.title}", @conversation.listing
+    %tr
+      %td= t('.booking_label')
+      %td.right
+        %small
+          = l(booking.start_on, format: :short)
+          \-
+          = l(booking.end_on, format: :short)
+    %tr
+      %td= t('.sum_label')
+      %td.right= humanized_money_with_symbol(@sum)
+
+  -#%p
+    = "#{t('.payment_receiver')}:"
+
+    = "#{link_to payment_receiver.name(@current_community), payment_receiver}".html_safe
+
+  -#%p
+    Property:
+    = link_to "#{@conversation.listing.title}", @conversation.listing
+  -#%p
+    Booked dates:
+    = l booking.check_in, format: :long_with_abbr_day_name
+    = "-"
+    = l booking.end_on, format: :long_with_abbr_day_name
+  -#%p
+    Booking fee:
+    = humanized_money_with_symbol(@sum)
+
+  = form_for @stripe_payment,
+    url: person_message_stripe_payment_path(@current_user.id,
+      @conversation.id,
+      @stripe_payment.id),
+      html: { id: 'stripe-payment-form' } do |form|
+
+    %article
+      - if flash[:error].present?
+        #error_explanation
+          %p= flash[:error]
+    %style
+      | .stripe-button-el{ height: inherit}
+    - pay_label = "Pay with Card"
+    - if @current_user.stripe_account && @current_user.stripe_account.has_stored_card?
+      - pay_label = "Use Another Card"
+      = hidden_field_tag "storedCard", ""
+      %button.stripe-button-el#pay-stored-card{type: "button"}
+        %span{style: "display: block; min-height: 30px;"}
+          = t(".pay_with", card: @current_user.stripe_account.stripe_source_info)
+
+    %script.stripe-button{"data-amount" => "#{@sum.cents}",
+      "data-currency" => "#{@sum.currency}",
+      "data-description" => "Booking fee for '#{@conversation.listing.title}' via PrivateMotorHomeRental.com",
+      "data-key" => "#{StripeApi.merchant_publishable_key(@current_community)}",
+      "data-locale" => "auto",
+      "data-label" => pay_label,
+      "data-email" => "#{@current_user.emails.where('confirmed_at IS NOT NULL').first.address}",
+      :src => "https://checkout.stripe.com/checkout.js"}
+
+    %br/
+
+    .row
+      .col-12
+        = t('.schedule_info')
+    .row
+      .col-12
+        %h3
+          = t('.security_info_header')
+
+        %small
+          = t('.security_info_text').html_safe
+
+  %noscript
+    = 'For security reasons JavaScript has to be enabled'
+  = content_for :extra_javascript do
+    :javascript
+      $("#pay-stored-card").click(function(e) {
+        e.preventDefault();
+        $("#stripe-payment-form #storedCard").val("true");
+        $("#stripe-payment-form").submit();
+        return false;
+      });
+    

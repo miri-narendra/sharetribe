@@ -1,0 +1,61 @@
+- content_for :extra_javascript do
+  :javascript
+    ST.initializeRadioButtons({
+      buttons: [".js-accept-radio-button", ".js-reject-radio-button", ".js-none-radio-button"],
+      input: ".js-accept-status",
+      callback: function(selector) {
+        switch(selector) {
+          case ".js-accept-radio-button":
+            $(".refund_sum").addClass('hidden');
+          break;
+          case ".js-reject-radio-button":
+            $(".refund_sum").removeClass('hidden');
+          break;
+          case ".js-none-radio-button":
+            $(".refund_sum").addClass('hidden');
+          break;
+
+        }
+      }
+    });
+
+- content_for :title_header do
+  %h1= t("layouts.no_tribe.inbox")
+
+.conversation-status-form{:class => (@current_community.vat ? "centered-section-wide" : "centered-section")}
+  - if @do_cancel
+    %h2= t("conversations.refund.header_to_cancel", amount: (@payment_schedule.paid_sum - @payment_schedule.paid_commission).format)
+  - else
+    %h2= t("conversations.refund.header", amount: @security_split.sum.format)
+
+  = form_for @listing_conversation, :url => refund_person_message_path(:person_id => @current_user.id, :id => @listing_conversation.id), :html => { :method => "put" } do |form|
+
+    %input.js-accept-status{type: :hidden, name: "refund_action", value: @action }
+
+    %a.radio-button-positive.js-accept-radio-button{ data: { :"radio-button-value" => "full_refund" }, class: @action == "full_refund" ? "radio-button-selected" : "" }
+      .radio-button-icon{class: icon_for("accepted")}
+      .radio-button-label
+        = t("conversations.refund.full")
+        = t("conversations.refund.and_cancel") if @do_cancel
+    %a.radio-button-negative.js-reject-radio-button{ data: { :"radio-button-value" => "partial_refund" }, class: @action == "partial_refund" ? "radio-button-selected" : "" }
+      .radio-button-icon{class: icon_for("rejected")}
+      .radio-button-label
+        = t("conversations.refund.partial")
+        = t("conversations.refund.and_cancel") if @do_cancel
+
+    - if @do_cancel
+      = hidden_field_tag :do_cancel, @do_cancel
+      %a.radio-button-neutral.js-none-radio-button{ data: { :"radio-button-value" => "no_refund" }, class: @action == "cancel_with_refund" ? "radio-button-selected" : "" }
+        .radio-button-icon{class: icon_for("rejected")}
+        .radio-button-label= t("conversations.refund.none")
+
+    %div{class: @action == 'full_refund' ? 'refund_sum hidden' : 'refund_sum'}
+      %label= t("conversations.refund.amount")
+      %input{name: 'refund_sum', type: 'text'}
+
+    %div
+      = fields_for :message, message_form do |message_form|
+        = message_form.label :content, t("conversations.new.message"), :class => "input"
+        = message_form.text_area :content, :class => "text_area", :placeholder => t("conversations.accept.optional_message")
+
+      = form.button t("conversations.new.submit"), :class => "send_button", :id => "send_testimonial_button"

@@ -1,0 +1,13 @@
+A new listing #{@listing.title} created by #{@community.full_name(@person.locale)}. Please approve it.
+
+%div{:style => "margin: 15px 0; padding: 10px; background-color: #d1c9b4;"}
+  %b Listing title:
+  = @listing.title
+  %br/
+  %b Owner's Name:
+  = @person.name(@community)
+  %br/
+  %b Owner's Email:
+  = @email
+
+This is an automatic message sent to administrators of #{@community.full_name(@person.locale)}.

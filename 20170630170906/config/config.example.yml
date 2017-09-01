@@ -1,0 +1,27 @@
+# Locally override default configurations
+#
+# This file overrides configurations set in `config/config.defaults.yml`.
+# Keep in mind that environment variables override setting in this file.
+#
+# Usage:
+#
+# Copy this file from `config/config.example.yml` to `config/config.yml`
+#
+
+development:
+  # Add local `development` environment configuration overrides here
+  salesforce_username: 'foo',
+  salesforce_password: 'bar',
+  salesforce_security_token: 'security token',
+  salesforce_client_id: 'client_id',
+  salesforce_client_secret: 'client_secret',
+  salesforce_api_version: '38.0'
+
+test:
+  # Add local `test` environment configuration overrides here
+
+staging:
+  # Add local `staging` environment configuration overrides here
+
+production:
+  # Add local `production` environment configuration overrides here

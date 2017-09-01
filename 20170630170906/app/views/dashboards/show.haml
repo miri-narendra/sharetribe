@@ -1,0 +1,33 @@
+- content_for :title_header do
+  %h1= t("layouts.no_tribe.dashboard")
+= render 'owner_dashboard', dashboard: dashboard
+.undo-mobile-wrapper-margin#transactions
+  .row
+    .col-1
+      = t('conversations.dashboard.headers.start_on')
+    .col-1
+      = t('conversations.dashboard.headers.end_on')
+    .col-2
+      = t('conversations.dashboard.headers.renter')
+    .col-3
+      = t('conversations.dashboard.headers.listing')
+    .col-1
+      = t('conversations.dashboard.headers.payment')
+    .col-1
+      = t('conversations.dashboard.headers.security_deposit')
+    .col-1
+      = t('conversations.dashboard.headers.paid')
+    .col-1
+      = t('conversations.dashboard.headers.amount_due')
+    .col-1
+      = t('conversations.dashboard.headers.next_payment_due')
+  - if transaction_rows.present?
+
+    = render :partial => "transaction_row", :collection => transaction_rows, :as => :transaction, :locals => {payments_in_use: payments_in_use}
+
+    = will_paginate(transaction_rows)
+    = pageless(transaction_rows.total_pages, '#transactions', request.path, t('conversations.dashboard.loading_more_transactions'))
+
+  - else
+    #no_transactions
+      = t("conversations.dashboard.no_transactions")

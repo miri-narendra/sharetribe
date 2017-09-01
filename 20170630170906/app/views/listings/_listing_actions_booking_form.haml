@@ -1,0 +1,117 @@
+-# This form is used by listings#show and by offers#new,
+  pre-population of values is only necessary in offers#new
+- values = {}
+- if @listing_conversation.present?
+  - values['booking_start_on']           = @listing_conversation.booking.start_on
+  - values['booking_end_on']             = @listing_conversation.booking.end_on
+  - values['booking_start_on_display']   = l(@listing_conversation.booking.start_on)
+  - values['booking_end_on_display']     = l(@listing_conversation.booking.end_on)
+  - values['cart_pickup_location']       = @listing_conversation.cart.pickup_location
+  - values['cart_dropoff_location']      = @listing_conversation.cart.dropoff_location
+  - values['cart_housekeeping_kit']      = @listing_conversation.cart.housekeeping_kit
+  - duration = TransactionService::Cart.calculate_duration(@listing_conversation.booking.start_on, @listing_conversation.booking.end_on, @listing_conversation.cart)
+  - values['cart_total_miles']           = TransactionService::Cart.calculate_total_miles(@listing_conversation.cart, duration)
+  - values['cart_total_generator_hours'] = TransactionService::Cart.calculate_total_generator_hours(@listing_conversation.cart, duration)
+- # Currently we show the selectors only for preauth process.
+- # However, there has been a plan to introduce these in other
+- # Processes (free) as well - rap1ds, 2.6.2015
+- if @listing.unit_type == :day
+  - days = [:sunday, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+  - months = [:january, :february, :march, :april, :may, :june, :july, :august, :september, :october, :november, :december]
+  - translated_days = days.map { |day_symbol| t("datepicker.days.#{day_symbol}") }.to_json
+  - translated_days_short = days.map { |day_symbol| t("datepicker.days_short.#{day_symbol}") }.to_json
+  - translated_days_min = days.map { |day_symbol| t("datepicker.days_min.#{day_symbol}") }.to_json
+  - translated_months = months.map { |day_symbol| t("datepicker.months.#{day_symbol}") }.to_json
+  - translated_months_short = months.map { |day_symbol| t("datepicker.months_short.#{day_symbol}") }.to_json
+
+  - content_for :extra_javascript do
+    :javascript
+      $.fn.datepicker.dates['#{I18n.locale}'] = {
+        days: #{translated_days},
+        daysShort: #{translated_days_short},
+        daysMin: #{translated_days_min},
+        months: #{translated_months},
+        monthsShort: #{translated_months_short},
+        today: "#{t("datepicker.today")}",
+        weekStart: #{t("datepicker.week_start", default: 0)},
+        clear: "#{t("datepicker.clear")}",
+        format: "#{t("datepicker.format")}"
+      }
+
+      $("#booking-dates").validate({
+        submitHandler: function(form) {
+          var $form = $(form);
+          $form.find("#start-on").attr("name", "");
+          $form.find("#end-on").attr("name", "");
+
+          form.submit();
+        }
+      });
+
+      window.ST.initializeFromToDatePicker('datepicker');
+  .input-daterange.input-group.clearfix#datepicker{:data => {:locale => I18n.locale, :dateformat => t("datepicker.format")}}
+    .datepicker-start-wrapper
+      = label_tag t("listings.listing_actions.booking_from")
+      %input.input-sm.form-control.required#start-on{:type => 'text', :name => "start_on", value: values['booking_start_on_display'], :placeholder => t("datepicker.format"), :data => { :output => "booking-start-output" } }
+      %input#booking-start-output{:type => 'hidden', :name => 'start_on', value: values['booking_start_on']}
+
+    .datepicker-end-wrapper
+      = label_tag t("listings.listing_actions.booking_to")
+      %input.input-sm.form-control.required#end-on{:type => 'text', :name => "end_on", value: values['booking_end_on_display'], :placeholder => t("datepicker.format"), :data => { :output => "booking-end-output" }}
+      %input#booking-end-output{:type => 'hidden', :name => 'end_on', value: values['booking_end_on']}
+
+  .input-group
+    = label_tag t("listings.listing_actions.pickup_location")
+    %input.input-sm.form-control#pickup-location{type: 'text', name: 'cart[pickup_location]', value: values['cart_pickup_location'], placeholder: t('listings.listing_actions.pickup_location_placeholder')}
+
+    = label_tag t("listings.listing_actions.dropoff_location")
+    %input.input-sm.form-control#dropoff-location{type: 'text', name: 'cart[dropoff_location]', value: values['cart_dropoff_location'], placeholder: t('listings.listing_actions.dropoff_location_placeholder')}
+
+  .input-group
+    %input{type: 'checkbox', name: 'cart[housekeeping_kit]', checked: !!(values['cart_housekeeping_kit']), id: 'input-housekeeping-kit'}
+    %label{style: 'display:inline', for: 'input-housekeeping-kit'}
+      = t('listings.listing_actions.housekeeping_kit')
+
+  .input-group
+    = label_tag t("listings.listing_actions.total_miles")
+    %input.input-sm.form-control#total-miles{type: 'text', name: 'cart[total_miles]', value: values['cart_total_miles'], placeholder: t('listings.listing_actions.total_miles_placeholder')}
+
+  .input-group
+    = label_tag t("listings.listing_actions.total_generator_hours")
+    %input.input-sm.form-control#total_generator-hours{type: 'text', name: 'cart[total_generator_hours]', value: values['cart_total_generator_hours'], placeholder: t('listings.listing_actions.total_generator_hours_placeholder')}
+
+- if listing_unit_type.present?
+  - delivery_type = delivery_opts.length > 0 ? delivery_opts.first[:name].to_s : ""
+  - shipping_price_additional = delivery_opts.length > 0 ? delivery_opts.first[:shipping_price_additional] : nil
+  - content_for :extra_javascript do
+    :javascript
+      $("#booking-dates").validate({
+        errorPlacement: function(error, element) {
+          if (element.is("#quantity")) {
+            error.insertAfter(".quantity-wrapper");
+          } else {
+            error.insertAfter(element);
+          }
+        }
+      });
+      $("#input-different-dropoff-location").on("click", function(){
+        if($("#input-different-dropoff-location").is(':checked')){
+          $("#dropoff-location-wrapper").show();
+        }else{
+          $("#dropoff-location-wrapper").hide();
+        }
+      });
+      window.ST.initializeQuantityValidation({validate: "positiveIntegers", input: "quantity", errorMessage: "#{t("errors.messages.positive_number")}" });
+      if ("#{delivery_type}" == "shipping" && #{shipping_price_additional != nil}) {
+        window.ST.initializeShippingPriceTotal('#quantity', '.delivery-price-value', '#{Maybe(delivery_opts)[0][:price].currency.decimal_mark.or_else(".")}');
+      }
+
+
+  -#.quantity-wrapper.input-group.clearfix
+    .quantity-label-wrapper
+      %label.quantity-label{for: 'quantity'}
+        = ListingViewUtils.translate_quantity(@listing.unit_type, @listing.unit_selector_tr_key)
+    .quantity-input.input-sm.required
+      %input#quantity{type: 'number', placeholder: t("listings.quantity_placeholder"), name: 'quantity', value: 1, min: 1, step: 1}
+
+= render partial: "listings/delivery_opts", locals: { delivery_opts: delivery_opts, is_author: is_author }

@@ -1,0 +1,32 @@
+.row-with-divider.without-margin.conversation-row
+
+  .col-1
+    = link_to person_transaction_path(person_id: @current_user, id: transaction) do
+      = l(transaction.booking.start_on, format: :short_numeric)
+  .col-1
+    = l(transaction.booking.end_on, format: :short_numeric)
+  .col-2
+    = link_to person_path(transaction.starter) do
+      = transaction.starter.name_or_username(@current_community)
+  .col-3
+    = link_to transaction.listing do
+      = transaction.listing.title
+  .col-1
+    = transaction.payment.adjusted_sum if transaction.payment.present? && transaction.payment.respond_to?(:adjusted_sum)
+  .col-1
+    = transaction.cart.security_deposit if transaction.cart.present?
+  .col-1
+    = transaction.payment.payment_splits.inject(0) do |memo, split|
+      - memo += split.sum if split.status == 'paid'
+      - memo
+  .col-1
+    - pending_splits = transaction.payment.payment_splits.find_all do |split|
+      - split.status == 'pending'
+    = pending_splits.inject(0) do |memo, split|
+      - memo += split.sum if split.due_on.present? && split.due_on <= Date.today
+      - memo
+  .col-1
+    - next_split = pending_splits.min do |a, b|
+      - a.due_on <=> b.due_on
+    = next_split.due_on if next_split.present?
+

@@ -1,0 +1,28 @@
+= render :partial => "layouts/left_hand_navigation", :locals => { :links => settings_links_for(@current_user, @current_community) }
+
+.left-navi-section.settings-section
+
+  %h2= t(".payout_details")
+
+  %p
+    = t(".stripe_user_id")
+    \:
+    = @stripe_account.stripe_user_id
+    %br
+    = t(".stripe_publishable_key")
+    \:
+    = @stripe_account.stripe_publishable_key
+
+  = form_for @stripe_account, :url => form_action, :html => { :id => "stripe_account_form"} do |form|
+
+    = form.button t(".reset_stripe_connection"), :class => "send_button"
+
+  %br/
+
+  %p
+    = link_to "https://stripe.com/" do
+      = image_tag("payments/stripe-logo.png", height: '32')
+
+    %br/
+
+    = t("stripe_accounts.our_secure_payment_provider")

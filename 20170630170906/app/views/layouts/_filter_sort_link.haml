@@ -1,0 +1,13 @@
+- url_params = {:sort => column, :direction => direction, :page => (params[:page] || 1)}
+- filter_params = nil if local_assigns[:filter_params].nil?
+- url_params[:filter] = filter_params if filter_params
+= link_to(url_params, {:class => "sort-link"}) do
+  .sort-text-wrapper
+    .sort-text
+      =title
+  - if params[:sort].eql?(column)
+    %div{:class => "sort-arrow-#{direction}"}
+      - if direction.eql?('asc')
+        ▼
+      - else
+        ▲

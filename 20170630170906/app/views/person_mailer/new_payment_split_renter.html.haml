@@ -1,0 +1,9 @@
+- conversation_url = person_transaction_url(@recipient, @url_params.merge({:id => @transaction.id.to_s}))
+
+%tr
+  %td{:align => "left"}
+    %font{body_font}
+      - booking = @transaction.booking
+      = t("emails.new_payment_split_renter.you_have_made_new_payment", :listing_title => @transaction.listing.title, :start_date => booking.start_on, :end_date => booking.end_on, :payment_sum => humanized_money_with_symbol(@payment.last_paid_split.sum), :seller_full_name => @transaction.seller.name(@transaction.community), :seller_given_name => @transaction.seller.given_name_or_username).html_safe
+
+= render :partial => "action_button", :locals => { :text => t("emails.conversation_status_changed.view_thread"), :url => conversation_url}

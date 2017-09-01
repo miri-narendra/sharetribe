@@ -1,0 +1,75 @@
+%h1
+  List of accounts which are unlinked:
+
+%table{:cellpadding => 5, :cellspacing => 0}
+  %tbody
+    %tr
+      %td
+        %b Owner Full Name
+      %td
+        %b Owner Email
+      %td
+        %b Owner Phone
+    - @stripe_not_linked_owners.each do |owner|
+      - owner_fullname = owner.name(:full_name)
+      - owner_email = owner.emails.last ? owner.emails.last.address : '';
+      %tr
+        %td
+          = link_to(person_path(username: owner.username), title: owner_fullname) do
+            = owner_fullname
+        %td
+          = owner_email
+        %td
+          = owner.phone_number
+
+%h1
+  List with listings which can’t be booked due to unlinked account:
+
+%table{:cellpadding => 5, :cellspacing => 0}
+  %tbody
+    %tr
+      %td
+        %b Listing URL
+      %td
+        %b Message
+      %td
+        %b Datetime
+      %td
+        %b Owner Full Name
+      %td
+        %b Owner Email
+      %td
+        %b Owner Phone
+      %td
+        %b Renter Full Name
+      %td
+        %b Renter Email
+      %td
+        %b Renter Phone
+    - @stripe_event_logs_weekly.each do |log|
+      - transaction = log.tx
+      - listing = transaction.listing
+      - owner = listing.author
+      - owner_email = owner.emails.last ? owner.emails.last.address : '';
+      - renter = transaction.starter
+      - renter_email = renter.emails.last ? renter.emails.last.address : '';
+      %tr
+        %td
+          = link_to(person_listing_path(person_id: listing.author.id, id: listing.id)) do
+            = listing.title
+        %td
+          = log.event_message
+        %td
+          = l log.created_at, :format => :short_date
+        %td
+          = owner.name(:full_name)
+        %td
+          = owner_email
+        %td
+          = owner.phone_number
+        %td
+          = renter.name(:full_name)
+        %td
+          = renter_email
+        %td
+          = renter.phone_number

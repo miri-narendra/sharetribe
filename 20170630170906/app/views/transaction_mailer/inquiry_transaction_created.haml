@@ -1,0 +1,38 @@
+%tr
+  %td{:align => "left"}
+    %font{body_font}
+
+      = t("emails.new_inquiry.has_sent_you_an_inquiry", :sender => sender_name)
+
+= render :partial => "person_mailer/action_button", :locals => { :text => t("emails.new_inquiry.view_inquiry"), :url => reply_url}
+- if recipient.allow_inquiry?
+  %tr
+    %td{:align => "left"}
+      %font{body_font}
+        %b Renter Name:
+        = sender_name
+        %br/
+        %b Renter Email:
+        = sender_email
+        %br/
+        %b Renter Phone:
+        = sender.phone_number
+        %br/
+        %b Vehicle requested:
+        = transaction.listing.title
+        %br/
+        %b date from:
+        = l(transaction.booking.start_on, format: :default)
+        %br/
+        %b date to:
+        = l(transaction.booking.end_on, format: :default)
+        %br/
+        %b Pickup location:
+        = transaction.cart.pickup_location
+        %br/
+        %b Drop off location:
+        = transaction.cart.dropoff_location
+        %br/
+        %b Renter message:
+        = transaction.conversation.last_message_by(sender).content
+        %br/

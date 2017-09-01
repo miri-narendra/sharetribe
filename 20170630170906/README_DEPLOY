@@ -1,0 +1,14 @@
+deploy knife solo
+if available - import data from sharetribe hosted
+create Procfile.staging without web: task, leave only delayed jobs related tasks (see Procfile as example)
+create staging.foreman file with contents “RAILS_ENV=staging"
+cap <environment> deploy
+if data not imported - load db:schema
+run rake ts:regenerate
+copy <current_release>/config/<environment>.sphinx.conf to shared/confg & edit - replace "release/<datetime>" with "shared"
+make rails user temporary sudo without password
+cap <environment> foreman:export
+remove sudo rights from rails user
+add to visudo “rails    ALL=NOPASSWD:/sbin/restart motorhome-staging"
+cap <environment> foreman:start
+cap <environment> deploy

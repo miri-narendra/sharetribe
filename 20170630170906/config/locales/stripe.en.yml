@@ -1,0 +1,30 @@
+en:
+  stripe_payments:
+    edit:
+      new_credit_card_payment: "New Credit Card Payment"
+      payment_title: "Due Payment"
+      help_text: "<p>To confirm your booking, you now need to pay the booking fee.</p></p>Click the 'Pay with card' button to proceed.</p>"
+      listing_title_label: "Motorhome:"
+      booking_label: "Booking:"
+      sum_label: "Due now:"
+      security_info_header: "Security information"
+      security_info_text: "<p>The payment form that will pop open is Secure.</p><p>For your security, we never receive or store your card details.</p>"
+      pay_with: "Pay with %{card}"
+      schedule_info: "The remaining payments have been scheduled and will be automatically charged on the due date."
+  stripe_accounts:
+    show:
+      payout_details: Payout Details
+      stripe_user_id: Stripe User ID
+      stripe_publishable_key: Stripe Publishable Key
+      reset_stripe_connection: Reset Stripe Connection
+    new:
+      add_payout_details: Add Payout Details
+      connect_to_stripe: Connect to Stripe
+    our_secure_payment_provider: Our secure payment provider
+  layouts:
+    notifications:
+      cannot_connect_stripe_account:
+        allready_connected: Cannot connect account. You already have one connected.
+        allready_connected_to_other_community: "Cannot connect account. You allready have payment account for community %{community_name}.  Unfortunately, you cannot have payment accounts for multiple communities. You are unable to receive money from transactions in community #{@current_community.name(I18n.locale)}. Please contact administrators."
+        received_error: "Cannot connect account. Stripe returned an error message: %{error_message}"
+        missing_authorization_code: Cannot connect account. Stripe did not send an authorization code

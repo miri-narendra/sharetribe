@@ -1,0 +1,9 @@
+.row
+  .col-4
+    = other_fee_form.text_field :name, class: :text_field, placeholder:t('transactions.pickup_dropoff_fee_form.other_fee_name_placeholder')
+  .col-7
+    = other_fee_form.text_field :amount, class: 'text_field cart_other_fee_amount_field', placeholder: t('transactions.pickup_dropoff_fee_form.other_fee_amount_placeholder')
+  .col-1
+    = other_fee_form.check_box :_destroy, class: 'destroy_other_fee_btn', style: 'display:none'
+    = other_fee_form.label :_destroy, style: 'cursor: pointer;' do
+      = icon_tag('cross', ['icon-fix-rel'])

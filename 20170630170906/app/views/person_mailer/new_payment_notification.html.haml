@@ -1,0 +1,54 @@
+= @transaction.seller.name(@community)
+has received a payment from
+= @transaction.buyer.name(@community)
+- owner  = @transaction.seller
+- renter = @transaction.buyer
+
+%div{:style => "margin: 15px 0; padding: 10px; background-color: #d1c9b4;"}
+  %b Owner Name:
+  = owner.name(@community)
+  %br/
+  %b Owner Email:
+  = owner.emails.last.address
+  %br/
+  %b Owner Phone:
+  = owner.phone_number
+  %br/
+  %b Vehicle Requested
+  = @transaction.listing.title
+  %br/
+  %b Renter Name:
+  = renter.name(@community)
+  %br/
+  %b Renter Email:
+  = renter.emails.last.address
+  %br/
+  %b Renter Phone:
+  = renter.phone_number
+  %br/
+  %b date from:
+  = l(@transaction.booking.start_on, format: :default)
+  %br/
+  %b date to:
+  = l(@transaction.booking.end_on, format: :default)
+  %br/
+  %b Pickup location:
+  = @transaction.cart.pickup_location
+  %br/
+  %b Drop off location:
+  = @transaction.cart.dropoff_location
+  %br/
+  %b Adjusted Price
+  = @payment.adjusted_sum.to_s
+  %br/
+  %b split payment amount:
+  = @last_paid_split.sum.to_s
+  %br/
+  %b split commission amount:
+  = @last_paid_split.commission.to_s
+  %br/
+
+%p
+  %a{:href => @transaction_url, :target => "_blank"} View transaction
+
+This is an automatic message sent to administrators of #{@community.full_name(@transaction.seller.locale)}.

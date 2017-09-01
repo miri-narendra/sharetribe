@@ -1,0 +1,10 @@
+- conversation_url = person_transaction_url(@recipient, @url_params.merge({:id => @transaction.id.to_s}))
+
+%tr
+  %td{:align => "left"}
+    %font{body_font}
+      = t("emails.payment_reminder.follow_up_with_renter_about_second_payment", :listing_title => @transaction.listing.title, :other_party_name => @transaction.other_party(@recipient).name(@transaction.community))
+
+%tr
+  %td{:align => "left", :style => "padding-top: 25px; padding-bottom: 25px;"}
+    = render :partial => "green_action_button", :locals => { :text => t("emails.conversation_status_changed.view_rental"), :url => conversation_url }

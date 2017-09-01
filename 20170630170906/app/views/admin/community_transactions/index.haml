@@ -1,0 +1,78 @@
+- content_for :title_header do
+  %h1
+    = t("layouts.admin.admin")
+    = "-"
+    = t("admin.communities.transactions.transactions")
+
+= render :partial => "admin/left_hand_navigation", :locals => { :links => admin_links_for(@current_community) }
+
+.left-navi-section
+  %h2= t("admin.communities.transactions.transactions", community_name: community.name(I18n.locale))
+
+  .admin-transaction-filter-form
+    = form_for :filter, :method => :get, :url => admin_community_transactions_path(:community_id => @current_community.id), :html => { :id => "admin_transactions_filter" } do |form|
+      = hidden_field_tag :page, params[:page] if params[:page]
+      = hidden_field_tag :sort, params[:sort] if params[:sort]
+      = hidden_field_tag :direction, params[:direction] if params[:direction]
+      %table
+        %tbody
+          %tr
+            %td
+              = form.label :starter, t("admin.communities.transactions.filter.initiated_by")
+              = form.text_field :starter, {value: filter_params[:starter]}
+            %td
+              = form.label :other_party, t("admin.communities.transactions.filter.other_party")
+              = form.text_field :other_party, {value: filter_params[:other_party]}
+            %td
+              = label_tag "status", t("admin.communities.transactions.headers.status")
+              .select-tag-dropdown
+                - options = [[t("admin.communities.transactions.filter.any_status"), "any"]] | transaction_statuses
+                = select_tag "filter[status]", options_for_select(options, filter_params[:status])
+            %td
+              = label_tag "payment_status", t("admin.communities.transactions.headers.payment_status")
+              .select-tag-dropdown
+                - options = [[t("admin.communities.transactions.filter.any_status"), "any"]] | transaction_payment_statuses
+                = select_tag "filter[payment_status]", options_for_select(options, filter_params[:payment_status])
+            %td
+              = button_tag t("admin.communities.transactions.filter.submit"), :class => "send_button"
+
+  - if feature_enabled?(:export_transactions_as_csv)
+    #export-as-csv.right= link_to(" " + t("admin.communities.transactions.export_all_as_csv"), {per_page: 99999, format: :csv}, {class: icon_class("download")})
+
+  %span#admin_transactions_count= page_entries_info(conversations, :model => "Transaction")
+
+  %table#admin_transactions
+    %thead
+      %tr
+        %th= render partial: "layouts/filter_sort_link", locals: { column: "listing", direction: sort_link_direction("listing"), filter_params: filter_params, title: t("admin.communities.transactions.headers.listing") }
+        %th=t("admin.communities.transactions.headers.status")
+        %th=t("admin.communities.transactions.headers.payment_status")
+        %th=t("admin.communities.transactions.headers.paid")
+        %th=t("admin.communities.transactions.headers.sum")
+        %th=t("admin.communities.transactions.headers.security_deposit")
+        %th= render partial: "layouts/filter_sort_link", locals: { column: "started", direction: sort_link_direction("started"), filter_params: filter_params, title: t("admin.communities.transactions.headers.started") }
+        %th= render partial: "layouts/filter_sort_link", locals: { column: "last_activity", direction: sort_link_direction("last_activity"), filter_params: filter_params, title: t("admin.communities.transactions.headers.last_activity") }
+        %th=t("admin.communities.transactions.headers.initiated_by")
+        %th=t("admin.communities.transactions.headers.other_party")
+
+    %tbody
+      - conversations.each do |conversation|
+        %tr
+          - listing_title = conversation[:listing_title] || t("admin.communities.transactions.not_available")
+          %td=Maybe(conversation[:listing]).map { |listing| link_to_unless(listing[:deleted], listing_title, conversation[:listing_url]) }.or_else(listing_title)
+          %td
+            = link_to person_transaction_path(person_id: @current_user.id, id: conversation[:id]) do
+              = t("admin.communities.transactions.status.#{conversation[:status]}")
+          %td
+            = link_to person_transaction_path(person_id: @current_user.id, id: conversation[:id]) do
+              = t("admin.communities.transactions.payment_status.#{conversation[:payment_status]}")
+          %td=conversation[:paid] ? humanized_money_with_symbol(conversation[:paid]) : ""
+          %td=conversation[:payment_total] ? humanized_money_with_symbol(conversation[:payment_total]) : ""
+          %td=conversation[:security_deposit] ? humanized_money_with_symbol(conversation[:security_deposit]) : ""
+          %td=l(conversation[:created_at], format: :short_date)
+          %td=l(conversation[:last_activity_at], format: :short_date)
+          %td=Maybe(conversation[:starter]).map { |p| link_to_unless(p[:is_deleted], p[:display_name], p[:url]) }.or_else("")
+          %td=Maybe(conversation[:author]).map { |p| link_to_unless(p[:is_deleted], p[:display_name], p[:url]) }.or_else("")
+  .row
+    .col-12
+      = will_paginate conversations

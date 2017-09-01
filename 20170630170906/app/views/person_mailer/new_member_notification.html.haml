@@ -1,0 +1,20 @@
+A new member has joined #{@community.full_name(@person.locale)}. They may still have to confirm their email address.
+
+%div{:style => "margin: 15px 0; padding: 10px; background-color: #d1c9b4;"}
+  - if @person.is_owner?
+    %b Owner Name:
+    = @person.name(@community)
+    %br/
+    %b Owner Email:
+    = @email
+    %br/
+    %b Owner Phone:
+    = @person.phone_number
+  - else
+    %b Name:
+    = @person.name(@community)
+    %br/
+    %b Email:
+    = @email
+
+This is an automatic message sent to administrators of #{@community.full_name(@person.locale)}.
