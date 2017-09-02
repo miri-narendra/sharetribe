@@ -1,0 +1,5 @@
+---
+BUNDLE_FROZEN: '1'
+BUNDLE_PATH: "/home/rails/production/shared/bundle"
+BUNDLE_WITHOUT: development:test
+BUNDLE_DISABLE_SHARED_GEMS: true
